@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div class="p-5">
+            <h2>Owner Table</h2>
+            <table id="ownerTable" class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">OwnerID</th>
+                        <th scope="col">OwnerName</th>
+                        <th scope="col">OwnerAddress</th>
+                        <th scope="col">OwnerCity</th>
+                        <th scope="col">OwnerZip</th>
+                        <th scope="col">OwnerMobileNo</th>
+                        <th scope="col">OwnerEmail</th>
+                        <th scope="col">IsActive</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </body>
+    <script>
+        $(document).ready(function () {
+            fetchOwnerData()
+            $(document).on("click", ".deactivate-owner", function () {
+                var ownerId = $(this).data("ownerid")
+                var ownerName = $(this).data("ownername")
+                var ownerIsActive = $(this).data("owneractive")
+                console.log(ownerIsActive)
+                var actionText =
+                    ownerIsActive === "No" ? "Activate" : "Deactivate"
+                var successMessage =
+                    ownerIsActive === "No"
+                        ? "Owner Activated Successfully"
+                        : "Owner Deactivated Successfully"
+                var confirmButtonText =
+                    ownerIsActive === "No"
+                        ? "Yes, Activate it!"
+                        : "Yes, Deactivate it!"
+                var ownerIsActiveValue = ownerIsActive === "Yes" ? "No" : "Yes"
+                var activeButton = ownerIsActive === "Yes" ? "red" : "green"
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    html:
+                        "You are about to " +
+                        actionText +
+                        " <strong>" +
+                        ownerName +
+                        "</strong>",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: activeButton,
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: confirmButtonText,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // User confirmed action, make an AJAX request to update the owner's active status
+                        $.ajax({
+                            url: "controller/update_owner_active_status.php",
+                            type: "POST",
+                            data: {
+                                ownerId: ownerId,
+                                ownerIsActive: ownerIsActiveValue,
+                            },
+                            success: function (response) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                    timerProgressBar: true,
+                                    didClose: () => {
+                                        fetchOwnerData()
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: successMessage,
+                                            toast: true,
+                                            position: "top-end",
+                                            showConfirmButton: false,
+                                            timer: 1200,
+                                        })
+                                    },
+                                })
+                                var updateMessage =
+                                    ownerIsActiveValue === "No"
+                                        ? "Deactivating ..."
+                                        : "Activating ..."
+                                Toast.fire({
+                                    icon: "success",
+                                    title: updateMessage,
+                                })
+                            },
+                            error: function (xhr, status, error) {
+                                // Display error message
+                                Swal.fire(
+                                    "Error!",
+                                    "An error occurred while updating the owner's active status. Please try again later.",
+                                    "error"
+                                )
+                                console.log(error)
+                            },
+                        })
+                    }
+                })
+            })
+            $(document).on("click", ".update-owner", function () {
+                var ownerId = $(this).data("ownerid")
+                console.log(ownerId)
+                // Make an AJAX request to fetch the owner details
+                $.ajax({
+                    url: "controller/fetchdata_ownerSpecific.php",
+                    type: "GET",
+                    dataType: "json",
+                    data: { ownerId: ownerId },
+                    success: function (response) {
+                        // $("#ownerModalLabel").text("Owner ID: " + ownerId)
+                        $("#ownerId").val(response[0].OwnerID)
+                        $("#ownerName").val(response[0].OwnerName)
+                        $("#ownerAddress").val(response[0].OwnerAddress)
+                        $("#ownerCity").val(response[0].OwnerCity)
+                        $("#ownerZip").val(response[0].OwnerZip)
+                        $("#ownerMobileNo").val(response[0].OwnerMobileNo)
+                        $("#ownerEmail").val(response[0].OwnerEmail)
+                        $("#ownerIsActive").val(response[0].IsActive)
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error)
+                    },
+                })
+            })
+            $(document).on("click", "#updateOwnerButton", function () {
+                var ownerId = $("#ownerId").val()
+                var ownerName = $("#ownerName").val()
+                var ownerAddress = $("#ownerAddress").val()
+                var ownerCity = $("#ownerCity").val()
+                var ownerZip = $("#ownerZip").val()
+                var ownerMobileNo = $("#ownerMobileNo").val()
+                var ownerEmail = $("#ownerEmail").val()
+                var ownerIsActive = $("#ownerIsActive").val()
+
+                // Make an AJAX request to update the owner details
+                $.ajax({
+                    url: "controller/update_owner.php",
+                    type: "POST",
+                    data: {
+                        ownerId: ownerId,
+                        ownerName: ownerName,
+                        ownerAddress: ownerAddress,
+                        ownerCity: ownerCity,
+                        ownerZip: ownerZip,
+                        ownerMobileNo: ownerMobileNo,
+                        ownerEmail: ownerEmail,
+                        ownerIsActive: ownerIsActive,
+                    },
+                    success: function (response) {
+                        // console.log(response)
+                        $("#updateOwnerModal").modal("hide")
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 1000,
+                            timerProgressBar: true,
+                            didClose: () => {
+                                fetchOwnerData()
+                            },
+                        })
+
+                        Toast.fire({
+                            icon: "success",
+                            title: "Updating ...",
+                        })
+
+                        // Handle the response accordingly
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error)
+                    },
+                })
+            })
+            $(document).on("click", ".delete-owner", function () {
+                var ownerId = $(this).data("ownerid")
+                var ownerName = $(this).data("ownername")
+                Swal.fire({
+                    title: "Are you sure?",
+                    html:
+                        "You are about to delete <strong>" +
+                        ownerName +
+                        "</strong>. This action cannot be undone.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // User confirmed deletion, make an AJAX request to delete the owner
+                        $.ajax({
+                            url: "controller/delete_owner.php",
+                            type: "POST",
+                            data: { ownerId: ownerId },
+                            success: function (response) {
+                                if (response === "success") {
+                                    const Toast = Swal.mixin({
+                                        toast: true,
+                                        position: "top-end",
+                                        showConfirmButton: false,
+                                        timer: 1000,
+                                        timerProgressBar: true,
+                                        didClose: () => {
+                                            fetchOwnerData()
+                                            Swal.fire({
+                                                icon: "success",
+                                                title: "Owner Deleted Successfully",
+                                                toast: true,
+                                                position: "top-end",
+                                                showConfirmButton: false,
+                                                timer: 1200,
+                                            })
+                                        },
+                                    })
+
+                                    Toast.fire({
+                                        icon: "success",
+                                        title: "Deleting ...",
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: response,
+                                        icon: "error",
+                                        showCancelButton: true,
+                                        cancelButtonColor: "#3085d6",
+                                        confirmButtonColor: "#d33",
+                                        cancelButtonText: "Ok",
+                                        confirmButtonText:
+                                            "Show Associated Pets",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            showAssociatedPets(ownerId)
+                                        }
+                                    })
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: response,
+                                    icon: "error",
+                                    showCancelButton: true,
+                                    cancelButtonColor: "#3085d6",
+                                    confirmButtonColor: "#d33",
+                                    cancelButtonText: "Ok",
+                                    confirmButtonText: "Show Associated Pets",
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        showAssociatedPets(ownerId)
+                                    }
+                                })
+                            },
+                        })
+                    }
+                })
+            })
+        })
+        $(document).on("click", ".view-owner", function () {
+            var ownerId = $(this).data("ownerid")
+            console.log(ownerId)
+            // Make an AJAX request to fetch the owner details
+            $.ajax({
+                url: "controller/fetchdata_ownerSpecific.php",
+                type: "GET",
+                dataType: "json",
+                data: { ownerId: ownerId },
+                success: function (response) {
+                    $("#viewOwnerId").text(response[0].OwnerID)
+                    $("#viewOwnerImage").attr(
+                        "src",
+                        "data:image/jpeg;base64," + response[0].OwnerImage
+                    )
+                    $("#viewOwnerName").text(response[0].OwnerName)
+                    $("#viewOwnerAddress").text(response[0].OwnerAddress)
+                    $("#viewOwnerCity").text(response[0].OwnerCity)
+                    $("#viewOwnerZip").text(response[0].OwnerZip)
+                    $("#viewOwnerMobileNo").text(response[0].OwnerMobileNo)
+                    $("#viewOwnerEmail").text(response[0].OwnerEmail)
+
+                    $("#viewOwnerIsActive").text(response[0].IsActive)
+                    $("#viewOwnerIsActive").attr(
+                        "class",
+                        "badge " +
+                            (response[0].IsActive === "Yes"
+                                ? "bg-success"
+                                : "bg-danger")
+                    )
+
+                    $("#viewOwnerModal").modal("show")
+                },
+                error: function (xhr, status, error) {
+                    console.log(error)
+                },
+            })
+        })
+
+        function limitText(text, limit) {
+            if (text.length > limit) {
+                return text.substring(0, limit) + "..."
+            }
+            return text
+        }
+        function fetchOwnerData() {
+            $.ajax({
+                url: "controller/fetchdata_owner.php",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    $("#ownerTable tbody").empty()
+                    $.each(response, function (index, owner) {
+                        var row = $("<tr></tr>")
+                        row.append("<td>" + owner.OwnerID + "</td>")
+                        row.append("<td>" + owner.OwnerName + "</td>")
+                        row.append("<td>" + owner.OwnerAddress + "</td>")
+                        row.append("<td>" + owner.OwnerCity + "</td>")
+                        row.append("<td>" + owner.OwnerZip + "</td>")
+                        row.append("<td>" + owner.OwnerMobileNo + "</td>")
+                        row.append("<td>" + owner.OwnerEmail + "</td>")
+                        row.append(
+                            "<td><span class='badge " +
+                                (owner.IsActive === "Yes"
+                                    ? "bg-success"
+                                    : "bg-danger") +
+                                "'>" +
+                                owner.IsActive +
+                                "</span></td>"
+                        )
+                        row.append(
+                            `
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-primary view-owner" data-bs-toggle="modal" data-bs-target="#viewOwnerModal" data-ownerid="${
+                                    owner.OwnerID
+                                }">
+                                    View
+                                </button>
+                                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button class="dropdown-item update-owner" data-bs-toggle="modal" data-bs-target="#updateOwnerModal" data-ownerid="${
+                                            owner.OwnerID
+                                        }">
+                                            <i class="fas fa-edit me-1"></i> Update
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item delete-owner" data-ownerid="${
+                                            owner.OwnerID
+                                        }" data-ownername="${owner.OwnerName}">
+                                            <i class="fas fa-trash-alt me-1"></i> Delete
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item deactivate-owner"
+                                        data-ownerid="${owner.OwnerID}"
+                                        data-ownername="${owner.OwnerName}"
+                                        data-owneractive="${owner.IsActive}">
+                                            <i class="fas fa-toggle-${
+                                                owner.IsActive === "Yes"
+                                                    ? "on text-success"
+                                                    : "off text-danger"
+                                            } me-1"></i>
+                                            ${
+                                                owner.IsActive === "Yes"
+                                                    ? "Deactivate"
+                                                    : "Activate"
+                                            }
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                        `
+                        )
+
+                        $("#ownerTable tbody").append(row)
+                    })
+
+                    $("#ownerTable").DataTable()
+                },
+                error: function (xhr, status, error) {
+                    console.log(error)
+                },
+            })
+        }
+        function showAssociatedPets(ownerId) {
+            // Make an AJAX request to fetch associated pets
+            $.ajax({
+                url: "controller/fetchdata_ownerPetSpecific.php",
+                type: "POST",
+                data: { ownerId: ownerId },
+                success: function (response) {
+                    const pets = JSON.parse(response)
+                    let htmlContent = "<ul class='list-group'>"
+
+                    pets.forEach((pet) => {
+                        htmlContent += `<li class='list-group-item'><span class='fw-bold'>Name:</span> ${pet.PetName}</li>`
+                        htmlContent += `<li class='list-group-item'><span class='fw-bold'>ID:</span> ${pet.PetID}</li>`
+                    })
+
+                    htmlContent += "</ul>"
+
+                    Swal.fire({
+                        title: "Associated Pets",
+                        html: htmlContent,
+                        confirmButtonText: "Close",
+                        customClass: {
+                            container: "swal-bootstrap-container",
+                            confirmButton: "btn btn-primary",
+                        },
+                    })
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire(
+                        "Error!",
+                        "An error occurred while fetching associated pets. Please try again later.",
+                        "error"
+                    )
+                },
+            })
+        }
+    </script>
+</html>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+<div
+    class="modal fade"
+    id="viewOwnerModal"
+    tabindex="-1"
+    aria-labelledby="viewOwnerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewOwnerModalLabel">Owner View</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    <strong>Owner ID:</strong>
+                    <span id="viewOwnerId"></span>
+                </p>
+                <p>
+                    <strong>Owner Name:</strong>
+                    <span id="viewOwnerName"></span>
+                </p>
+                <p>
+                    <strong>Owner Address:</strong>
+                    <span id="viewOwnerAddress"></span>
+                </p>
+                <p>
+                    <strong>Owner City:</strong>
+                    <span id="viewOwnerCity"></span>
+                </p>
+                <p>
+                    <strong>Owner Zip:</strong>
+                    <span id="viewOwnerZip"></span>
+                </p>
+                <p>
+                    <strong>Owner Mobile No:</strong>
+                    <span id="viewOwnerMobileNo"></span>
+                </p>
+                <p>
+                    <strong>Owner Email:</strong>
+                    <span id="viewOwnerEmail"></span>
+                </p>
+                <p>
+                    <strong>Is Active:</strong>
+                    <span id="viewOwnerIsActive"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div
+    class="modal fade"
+    id="updateOwnerModal"
+    tabindex="-1"
+    aria-labelledby="updateOwnerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateOwnerModalLabel">
+                    Owner Details
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="ownerId" class="form-label">Owner ID:</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="ownerId"
+                        disabled />
+                </div>
+                <div class="mb-3">
+                    <label for="ownerName" class="form-label"
+                        >Owner Name:</label
+                    >
+                    <input type="text" class="form-control" id="ownerName" />
+                </div>
+                <div class="mb-3">
+                    <label for="ownerAddress" class="form-label"
+                        >Owner Address:</label
+                    >
+                    <input type="text" class="form-control" id="ownerAddress" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="ownerCity" class="form-label"
+                                >Owner City:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="ownerCity" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="ownerZip" class="form-label"
+                                >Owner Zip:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="ownerZip" />
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="ownerMobileNo" class="form-label"
+                        >Owner Mobile No:</label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="ownerMobileNo" />
+                </div>
+                <div class="mb-3">
+                    <label for="ownerEmail" class="form-label"
+                        >Owner Email:</label
+                    >
+                    <input type="email" class="form-control" id="ownerEmail" />
+                </div>
+                <div class="mb-3">
+                    <label for="ownerIsActive" class="form-label"
+                        >Is Active:</label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="ownerIsActive" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="updateOwnerButton">
+                    Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

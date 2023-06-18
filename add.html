@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="p-5">
+                        <ul class="nav nav-tabs mb-4">
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link active tab-link"
+                                    data-bs-toggle="tab"
+                                    href="#newOwner"
+                                    >Add New Owners</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link tab-link"
+                                    data-bs-toggle="tab"
+                                    href="#existingOwner"
+                                    >Existing Owner</a
+                                >
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div
+                                class="tab-pane fade show active"
+                                id="newOwner">
+                                <h1 class="text-center mb-4">
+                                    Owner information
+                                </h1>
+                                <form>
+                                    <div class="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="ownerName"
+                                            placeholder="Enter owner's name"
+                                            required />
+                                        <label
+                                            for="ownerName"
+                                            class="form-label"
+                                            >Owner Name</label
+                                        >
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="ownerAddress"
+                                            placeholder="Enter owner's address"
+                                            required />
+                                        <label
+                                            for="ownerAddress"
+                                            class="form-label"
+                                            >Owner Address</label
+                                        >
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="ownerCity"
+                                            placeholder="Enter owner's city"
+                                            required />
+                                        <label
+                                            for="ownerCity"
+                                            class="form-label"
+                                            >Owner City</label
+                                        >
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="ownerZip"
+                                            placeholder="Enter owner's zip"
+                                            required />
+                                        <label for="ownerZip" class="form-label"
+                                            >Owner Zip</label
+                                        >
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="ownerMobileNo"
+                                            placeholder="Enter owner's mobile number"
+                                            required />
+                                        <label
+                                            for="ownerMobileNo"
+                                            class="form-label"
+                                            >Owner Mobile No</label
+                                        >
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input
+                                            type="email"
+                                            class="form-control"
+                                            id="ownerEmail"
+                                            placeholder="Enter owner's email"
+                                            required />
+                                        <label
+                                            for="ownerEmail"
+                                            class="form-label"
+                                            >Owner Email</label
+                                        >
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="tab-pane fade" id="existingOwner">
+                                <h1 class="text-center mb-4">
+                                    Select Existing Owner
+                                </h1>
+                                <form>
+                                    <div
+                                        class="form-floating mb-3"
+                                        id="existingOwner">
+                                        <select
+                                            class="form-select"
+                                            id="existingOwnerSelect">
+                                            <option
+                                                value=""
+                                                class="text-center"
+                                                value="default"></option>
+                                        </select>
+                                        <label
+                                            for="existingOwner"
+                                            class="form-label"
+                                            >Select Owner</label
+                                        >
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-5">
+                        <h1 class="text-center mb-4">Pet information</h1>
+                        <form>
+                            <div class="form-floating mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="name"
+                                    placeholder="Enter pet's name"
+                                    required />
+                                <label for="name" class="form-label"
+                                    >Name</label
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="type"
+                                    placeholder="Enter pet's type"
+                                    required />
+                                <label for="type" class="form-label"
+                                    >Type</label
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="breed"
+                                    placeholder="Enter pet's breed"
+                                    required />
+                                <label for="breed" class="form-label"
+                                    >Breed</label
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="birthdate"
+                                    required />
+                                <label for="birthdate" class="form-label"
+                                    >Birthdate</label
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                <select
+                                    class="form-select"
+                                    id="gender"
+                                    required>
+                                    <option value="">Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                                <label for="gender" class="form-label"
+                                    >Gender</label
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                <textarea
+                                    class="form-control"
+                                    id="notes"
+                                    rows="3"
+                                    placeholder="Enter any notes"></textarea>
+                                <label for="notes" class="form-label"
+                                    >Notes</label
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <label for="petImage" class="form-label"
+                                    >Pet Image</label
+                                >
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    id="petImage"
+                                    accept="image/*" />
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">
+                                    Add
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+<script>
+    $(document).ready(function () {
+        // alert("asdasd")
+        // $("#existingOwnerSelect").change(function () {
+        //     var selectedValue = $(this).val()
+        //     if (selectedValue !== "default") {
+        //         console.log("Selected owners: " + selectedValue)
+        //     }
+        // })
+
+        var isNewOwnerClicked = true
+
+        $(".tab-link").click(function () {
+            var tabId = $(this).attr("href")
+            if (tabId === "#newOwner") {
+                isNewOwnerClicked = true
+                // console.log(isNewOwnerClicked)
+                // console.log("asdsad")
+            } else {
+                isNewOwnerClicked = false
+                // console.log(isNewOwnerClicked)
+            }
+        })
+        $.ajax({
+            url: "controller/fetchdata_ownerID.php",
+            type: "GET",
+            success: function (response) {
+                var owners = JSON.parse(response)
+                $.each(owners, function (index, owner) {
+                    var option = $("<option></option>")
+                        .text(owner.OwnerName)
+                        .val(owner.OwnerID)
+                    $("#existingOwner select").append(option)
+                })
+            },
+            error: function (xhr, status, error) {
+                console.log(error)
+            },
+        })
+
+        $("form").submit(function (event) {
+            event.preventDefault()
+            var ownerName = $("#ownerName").val()
+            var ownerAddress = $("#ownerAddress").val()
+            var ownerCity = $("#ownerCity").val()
+            var ownerZip = $("#ownerZip").val()
+            var ownerMobileNo = $("#ownerMobileNo").val()
+            var ownerEmail = $("#ownerEmail").val()
+            var isActive = $("#isActive").val()
+            if (isNewOwnerClicked) {
+                if (
+                    ownerName === "" ||
+                    ownerAddress === "" ||
+                    ownerCity === "" ||
+                    ownerZip === "" ||
+                    ownerMobileNo === "" ||
+                    ownerEmail === "" ||
+                    isActive === ""
+                ) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    })
+
+                    Toast.fire({
+                        icon: "warning",
+                        title: "Please fill all fields",
+                    })
+                } else {
+                    var ownerFormData = {
+                        ownerName: ownerName,
+                        ownerAddress: ownerAddress,
+                        ownerCity: ownerCity,
+                        ownerZip: ownerZip,
+                        ownerMobileNo: ownerMobileNo,
+                        ownerEmail: ownerEmail,
+                        isActive: isActive,
+                    }
+                    $.ajax({
+                        url: "controller/add_owner.php",
+                        type: "POST",
+                        data: ownerFormData,
+                        success: function (response) {
+                            console.log(response)
+                            addPet(response)
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error)
+                        },
+                    })
+                }
+            } else {
+                var existingOwner = $("#existingOwnerSelect").val()
+                if (existingOwner === "") {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        // timerProgressBar: true,
+                    })
+
+                    Toast.fire({
+                        icon: "error",
+                        title: "Select Owner!",
+                    })
+                } else {
+                    addPet(existingOwner)
+                }
+            }
+        })
+    })
+    function addPet(ownerID) {
+        var petName = $("#name").val()
+        var petType = $("#type").val()
+        var petBreed = $("#breed").val()
+        var petBdate = $("#birthdate").val()
+        var petGender = $("#gender").val()
+        var petNotes = $("#notes").val()
+        var petImage = $("#petImage")[0].files[0] // Get the uploaded image file
+
+        var petFormData = new FormData()
+        petFormData.append("petName", petName)
+        petFormData.append("petType", petType)
+        petFormData.append("petBreed", petBreed)
+        petFormData.append("petBdate", petBdate)
+        petFormData.append("petGender", petGender)
+        petFormData.append("petNotes", petNotes)
+        petFormData.append("petOwnerID", ownerID)
+        petFormData.append("petImage", petImage) // Append the pet image file
+
+        console.log(petFormData)
+        $.ajax({
+            url: "controller/add_pet.php",
+            type: "POST",
+            data: petFormData,
+            processData: false, // Important: prevent jQuery from processing the data
+            contentType: false, // Important: prevent jQuery from setting content type
+            success: function (response) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 1000,
+                    timerProgressBar: true,
+                    didClose: () => {
+                        // Reset form fields
+                        $("input[type='text']").val("")
+                        $("select").prop("selectedIndex", 0)
+                        $("textarea").val("")
+                        $("input[type='email']").val("")
+                        $("input[type='file']").val("")
+                        $("input[type='date']").val("")
+                        Swal.fire({
+                            icon: "success",
+                            title: "Pet Added Successfully",
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 1200,
+                        })
+                    },
+                })
+
+                Toast.fire({
+                    icon: "success",
+                    title: "Adding Pet ...",
+                })
+            },
+            error: function (xhr, status, error) {
+                console.log(error)
+            },
+        })
+    }
+</script>

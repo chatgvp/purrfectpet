@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div class="p-5">
+            <h2>Pet Table</h2>
+            <table id="petTable" class="table">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">PetID</th>
+                        <th scope="col">PetImage</th>
+                        <th scope="col">PetName</th>
+                        <th scope="col">PetType</th>
+                        <th scope="col">IsActive</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </body>
+    <script>
+        $(document).ready(function () {
+            fetchPetData()
+
+            $(document).on("click", ".update-pet", function () {
+                var petId = $(this).data("petid")
+                console.log(petId)
+                // Make an AJAX request to fetch the pet details
+                $.ajax({
+                    url: "controller/fetchdata_petSpecific.php",
+                    type: "GET",
+                    dataType: "json",
+                    data: { petId: petId },
+                    success: function (response) {
+                        console.log("dasdsadsad")
+
+                        console.log(response)
+                        $("#updatePetModalLabel").text("Pet IDs: " + petId)
+                        $("#petImage").attr(
+                            "src",
+                            "data:image/jpeg;base64," + response[0].PetImage
+                        )
+                        // $("#FpetImage").val(response[0].PetID)
+                        $("#petId").val(response[0].PetID)
+                        $("#petName").val(response[0].PetName)
+                        $("#petType").val(response[0].PetType)
+                        $("#petBreed").val(response[0].PetBreed)
+                        $("#petBdate").val(response[0].PetBdate)
+                        $("#petGender").val(response[0].PetGender)
+                        $("#petNotes").val(response[0].PetNotes)
+                        $("#petOwnerID").val(response[0].PetOwnerID)
+                        $("#petIsActive").val(response[0].IsActive)
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error)
+                    },
+                })
+            })
+            $(document).on("click", "#updatePetButton", function () {
+                var petId = $("#petId").val()
+                var petName = $("#petName").val()
+                var petType = $("#petType").val()
+                var petBreed = $("#petBreed").val()
+                var petBdate = $("#petBdate").val()
+                var petGender = $("#petGender").val()
+                var petNotes = $("#petNotes").val()
+                var petOwnerID = $("#petOwnerID").val()
+                var petIsActive = $("#petIsActive").val()
+                var FpetImage = $("#FpetImage")[0].files[0]
+
+                // Create a FormData object and append the updated values
+                var formData = new FormData()
+                formData.append("petId", petId)
+                formData.append("petName", petName)
+                formData.append("petType", petType)
+                formData.append("petBreed", petBreed)
+                formData.append("petBdate", petBdate)
+                formData.append("petGender", petGender)
+                formData.append("petNotes", petNotes)
+                formData.append("petOwnerID", petOwnerID)
+                formData.append("petIsActive", petIsActive)
+
+                if (FpetImage) {
+                    formData.append("FpetImage", FpetImage)
+                }
+
+                // Make an AJAX request to update the pet details
+                $.ajax({
+                    url: "controller/update_pet.php",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        console.log(response)
+                        $("#updatePetModal").modal("hide")
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 1000,
+                            timerProgressBar: true,
+                            didClose: () => {
+                                fetchPetData()
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Pet Updated Successfully",
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 1200,
+                                })
+                            },
+                        })
+                        Toast.fire({
+                            icon: "success",
+                            title: "Updating",
+                        })
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("AMBOT")
+                        console.log(error)
+                    },
+                })
+            })
+
+            $(document).on("click", ".delete-pet", function () {
+                var petId = $(this).data("petid")
+                var petName = $(this).data("petname")
+
+                // Display SweetAlert2 confirmation dialog
+                Swal.fire({
+                    title: "Are you sure?",
+                    html:
+                        "You are about to delete <strong>" +
+                        petName +
+                        "</strong>. This action cannot be undone.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // User confirmed deletion, make an AJAX request to delete the pet
+                        $.ajax({
+                            url: "controller/delete_pet.php",
+                            type: "POST",
+                            data: { petId: petId },
+                            success: function (response) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                    timerProgressBar: true,
+                                    didClose: () => {
+                                        fetchPetData()
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Pet Deleted Successfully",
+                                            toast: true,
+                                            position: "top-end",
+                                            showConfirmButton: false,
+                                            timer: 1200,
+                                        })
+                                    },
+                                })
+
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Deleting ...",
+                                })
+                            },
+                            error: function (xhr, status, error) {
+                                // Display error message
+                                Swal.fire(
+                                    "Error!",
+                                    "An error occurred while deleting the pet. Please try again later.",
+                                    "error"
+                                )
+                                console.log(error)
+                            },
+                        })
+                    }
+                })
+            })
+        })
+        $(document).on("click", ".deactivate-pet", function () {
+            var petId = $(this).data("petid")
+            var petName = $(this).data("petname")
+            var petIsActive = $(this).data("petactive")
+            console.log(petIsActive)
+            var actionText = petIsActive === "No" ? "Activate" : "Deactivate"
+            var successMessage =
+                petIsActive === "No"
+                    ? "Pet Activated Successfully"
+                    : "Pet Deactivated Successfully"
+            var confirmButtonText =
+                petIsActive === "No"
+                    ? "Yes, Activate it!"
+                    : "Yes, Deactivate it!"
+            var petIsActiveValue = petIsActive === "Yes" ? "No" : "Yes"
+            var activeButton = petIsActive === "Yes" ? "red" : "green"
+
+            Swal.fire({
+                title: "Are you sure?",
+                html:
+                    "You are about to " +
+                    actionText +
+                    " <strong>" +
+                    petName +
+                    "</strong>",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: activeButton,
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: confirmButtonText,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // User confirmed action, make an AJAX request to update the pet's active status
+                    $.ajax({
+                        url: "controller/update_pet_active_status.php",
+                        type: "POST",
+                        data: { petId: petId, petIsActive: petIsActiveValue },
+                        success: function (response) {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: "top-end",
+                                showConfirmButton: false,
+                                timer: 1000,
+                                timerProgressBar: true,
+                                didClose: () => {
+                                    fetchPetData()
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: successMessage,
+                                        toast: true,
+                                        position: "top-end",
+                                        showConfirmButton: false,
+                                        timer: 1200,
+                                    })
+                                },
+                            })
+                            var updateMessage =
+                                petIsActiveValue === "No"
+                                    ? "Deactivating ..."
+                                    : "Activating ..."
+                            Toast.fire({
+                                icon: "success",
+                                title: updateMessage,
+                            })
+                        },
+                        error: function (xhr, status, error) {
+                            // Display error message
+                            Swal.fire(
+                                "Error!",
+                                "An error occurred while updating the pet's active status. Please try again later.",
+                                "error"
+                            )
+                            console.log(error)
+                        },
+                    })
+                }
+            })
+        })
+
+        $(document).on("click", ".view-pet", function () {
+            var petId = $(this).data("petid")
+            console.log(petId)
+            // Make an AJAX request to fetch the pet details
+            $.ajax({
+                url: "controller/fetchdata_petSpecific.php",
+                type: "GET",
+                dataType: "json",
+                data: { petId: petId },
+                success: function (response) {
+                    $("#viewPetId").text(response[0].PetID)
+                    $("#viewPetImage").attr(
+                        "src",
+                        "data:image/jpeg;base64," + response[0].PetImage
+                    )
+                    $("#viewPetName").text(response[0].PetName)
+                    $("#viewPetType").text(response[0].PetType)
+                    $("#viewPetBreed").text(response[0].PetBreed)
+                    $("#viewPetBdate").text(response[0].PetBdate)
+                    $("#viewPetGender").text(response[0].PetGender)
+                    $("#viewPetNotes").text(response[0].PetNotes)
+                    $("#viewPetOwnerID").text(response[0].PetOwnerID)
+
+                    $("#viewPetIsActive").text(response[0].IsActive)
+                    $("#viewPetIsActive").attr(
+                        "class",
+                        "badge " +
+                            (response[0].IsActive === "Yes"
+                                ? "bg-success"
+                                : "bg-danger")
+                    )
+
+                    $("#viewPetModal").modal("show")
+                },
+                error: function (xhr, status, error) {
+                    console.log(error)
+                },
+            })
+        })
+
+        function fetchPetData() {
+            $.ajax({
+                url: "controller/fetchdata_pet.php",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    $("#petTable tbody").empty()
+                    $.each(response, function (index, pet) {
+                        var row = $("<tr></tr>")
+                        row.append("<td>" + pet.PetID + "</td>")
+                        row.append(
+                            "<td><img src='data:image/jpeg;base64," +
+                                pet.PetImage +
+                                "' alt='Pet Image' width='100'></td>"
+                        )
+                        row.append("<td>" + pet.PetName + "</td>")
+                        row.append("<td>" + pet.PetType + "</td>")
+                        row.append(
+                            "<td><span class='badge " +
+                                (pet.IsActive === "Yes"
+                                    ? "bg-success"
+                                    : "bg-danger") +
+                                "'>" +
+                                pet.IsActive +
+                                "</span></td>"
+                        )
+
+                        row.append(
+                            `
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-primary view-pet" data-bs-toggle="modal" data-bs-target="#viewPetModal" data-petid="${
+                                        pet.PetID
+                                    }">
+                                        View
+                                    </button>
+                                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item update-pet" data-bs-toggle="modal" data-bs-target="#updatePetModal" data-petid="${
+                                                pet.PetID
+                                            }">
+                                                <i class="fas fa-edit me-1"></i> Update
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item delete-pet" data-petid="${
+                                                pet.PetID
+                                            }" data-petname="${pet.PetName}">
+                                                <i class="fas fa-trash-alt me-1"></i> Delete
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item deactivate-pet" 
+                                            data-petid="${pet.PetID}" 
+                                            data-petname="${pet.PetName}"
+                                            data-petactive="${pet.IsActive}">
+                                                <i class="fas fa-toggle-${
+                                                    pet.IsActive === "Yes"
+                                                        ? "on text-success"
+                                                        : "off text-danger"
+                                                } me-1"></i>
+                                                ${
+                                                    pet.IsActive === "Yes"
+                                                        ? "Deactivate"
+                                                        : "Activate"
+                                                }
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+
+                            `
+                        )
+
+                        $("#petTable tbody").append(row)
+                    })
+
+                    $("#petTable").DataTable()
+                },
+                error: function (xhr, status, error) {
+                    console.log(error)
+                },
+            })
+        }
+        function limitText(text, limit) {
+            if (text.length > limit) {
+                return text.substring(0, limit) + "..."
+            }
+            return text
+        }
+    </script>
+</html>
+<!-- Modal -->
+<div
+    class="modal fade"
+    id="updatePetModal"
+    tabindex="-1"
+    aria-labelledby="updatePetModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updatePetModalLabel">
+                    Pet Details
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img
+                            class="img-fluid"
+                            id="petImage"
+                            alt="Pet Image"
+                            src="" />
+                        <label for="petImage" class="form-label"
+                            >Update Image</label
+                        >
+                        <input
+                            type="file"
+                            class="form-control"
+                            id="FpetImage"
+                            accept="image/*" />
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="petId" class="form-label"
+                                >Pet ID:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petId"
+                                disabled />
+                        </div>
+                        <div class="mb-3">
+                            <label for="petName" class="form-label"
+                                >Pet Name:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petName" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="petType" class="form-label"
+                                >Pet Type:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petType" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="petBreed" class="form-label"
+                                >Pet Breed:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petBreed" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="petBdate" class="form-label"
+                                >Pet Birthdate:</label
+                            >
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="petBdate" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="petGender" class="form-label"
+                                >Pet Gender:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petGender" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="petNotes" class="form-label"
+                                >Pet Notes:</label
+                            >
+                            <!-- <input
+                                type="textarea"
+                                class="form-control"
+                                id="" /> -->
+                            <textarea
+                                class="form-control"
+                                id="petNotes"
+                                rows="3"
+                                placeholder="Enter any notes"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="petOwnerID" class="form-label"
+                                >Pet Owner ID:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petOwnerID"
+                                disabled />
+                        </div>
+                        <!-- <div class="mb-3">
+                            <label for="petIsActive" class="form-label"
+                                >Is Active:</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="petIsActive" />
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="updatePetButton">
+                    Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div
+    class="modal fade"
+    id="viewPetModal"
+    tabindex="-1"
+    aria-labelledby="viewPetModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPetModalLabel">Pet View</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img
+                            class="img-fluid"
+                            style="background-size: cover; height: 500px"
+                            id="viewPetImage"
+                            alt="Pet Image"
+                            src="" />
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Pet ID:</strong>
+                            <span id="viewPetId"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Name:</strong>
+                            <span id="viewPetName"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Type:</strong>
+                            <span id="viewPetType"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Breed:</strong>
+                            <span id="viewPetBreed"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Birthdate:</strong>
+                            <span id="viewPetBdate"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Gender:</strong>
+                            <span id="viewPetGender"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Notes:</strong>
+                            <span id="viewPetNotes"></span>
+                        </p>
+                        <p>
+                            <strong>Pet Owner ID:</strong>
+                            <span id="viewPetOwnerID"></span>
+                        </p>
+                        <p>
+                            <strong>Is Active:</strong>
+                            <span id="viewPetIsActive"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

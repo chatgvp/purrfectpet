@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<style>
+    .card {
+        height: 100%;
+        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-15px);
+        box-shadow: 10px 20px 30px rgba(0, 0, 0, 0.3);
+    }
+</style>
+<html>
+    <body>
+        <div class="p-5">
+            <div class="row align-items-end">
+                <div class="col-md-6 mb-3">
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="searchInput"
+                            placeholder="Search Pet" />
+
+                        <div class="input-group-append">
+                            <button
+                                class="btn btn-outline-secondary"
+                                type="button"
+                                id="searchButton">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="petCards">
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-3" id="cardTemplate">
+                    <div
+                        class="card h-100 d-flex flex-column justify-content-between align-items-center">
+                        <img
+                            class="card-img-top"
+                            style="object-fit: cover; height: 300px" />
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <h3 class="card-name"></h3>
+                            </h5>
+                            <div class="card-text">
+                                <p>
+                                    <span class="pet-type"></span>
+                                </p>
+                                <p>
+                                    <span class="pet-breed"></span>
+                                </p>
+                                <p>
+                                    <span class="pet-id"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="modal fade"
+            id="viewPetModal"
+            tabindex="-1"
+            aria-labelledby="viewPetModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewPetModalLabel">
+                            Pet View
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img
+                                    class="img-fluid"
+                                    style="object-fit: cover; height: 500px"
+                                    id="viewPetImage"
+                                    alt="Pet Image"
+                                    src="" />
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Pet ID:</strong>
+                                    <span id="viewPetId"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Name:</strong>
+                                    <span id="viewPetName"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Type:</strong>
+                                    <span id="viewPetType"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Breed:</strong>
+                                    <span id="viewPetBreed"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Birthdate:</strong>
+                                    <span id="viewPetBdate"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Gender:</strong>
+                                    <span id="viewPetGender"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Notes:</strong>
+                                    <span id="viewPetNotes"></span>
+                                </p>
+                                <p>
+                                    <strong>Pet Owner ID:</strong>
+                                    <span id="viewPetOwnerID"></span>
+                                </p>
+                                <p>
+                                    <strong>Is Active:</strong>
+                                    <span id="viewPetIsActive"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function () {
+                $("#searchButton").click(function () {
+                    fetchData("")
+                    $("#searchInput").val("")
+                })
+                fetchData("")
+                $("#searchInput").on("input", function (event) {
+                    var searchTerm = $(this).val().trim()
+                    if (searchTerm === "") {
+                        fetchData("")
+                    } else {
+                        fetchData(searchTerm)
+                    }
+                })
+                function fetchData(searchTerm) {
+                    $.ajax({
+                        url: "controller/fetchdata_pet.php",
+                        type: "GET",
+                        dataType: "json",
+                        data: { search: searchTerm },
+                        success: function (response) {
+                            // console.log(response)
+                            var petCards = $("#petCards")
+                            var cardTemplate = $("#cardTemplate")
+                            petCards.empty()
+                            if (response.length > 0) {
+                                $.each(response, function (index, pet) {
+                                    var card = cardTemplate.clone()
+                                    card.find(".card-img-top").attr(
+                                        "src",
+                                        "data:image/jpeg;base64," + pet.PetImage
+                                    )
+                                    card.find(".card-name").text(pet.PetName)
+                                    var petId = card.find(".pet-id")
+                                    petId.html(
+                                        "<strong>ID:</strong> " + pet.PetID
+                                    ) // Add PetID with "ID" text bold
+                                    var petType = card.find(".pet-type")
+                                    petType.html(
+                                        "<strong>Type:</strong> " + pet.PetType
+                                    ) // Set "Type" text as bold
+                                    var petBreed = card.find(".pet-breed")
+                                    petBreed.html(
+                                        "<strong>Breed:</strong> " +
+                                            pet.PetBreed
+                                    ) // Set "Breed" text as bold
+                                    card.click(function () {
+                                        populateModal(pet)
+                                        $("#viewPetModal").modal("show")
+                                    })
+                                    petCards.append(card)
+                                })
+                            } else {
+                                // petCards.append("<p>No results found.</p>")
+                                cardTemplate.remove()
+                                var card = cardTemplate.clone()
+                                card.find(".card-img-top").attr(
+                                    "src",
+                                    "image/noresult.jpg"
+                                )
+                                card.find(".card-name").text("No results found")
+                                card.find(".pet-type").text("")
+                                card.find(".pet-breed").text("")
+                                card.find(".pet-id").text("")
+                                petCards.append(card)
+                            }
+
+                            cardTemplate.remove()
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error)
+                        },
+                    })
+                }
+            })
+            function populateModal(pet) {
+                $("#viewPetImage").attr(
+                    "src",
+                    "data:image/jpeg;base64," + pet.PetImage
+                )
+                $("#viewPetId").text(pet.PetID)
+                $("#viewPetName").text(pet.PetName)
+                $("#viewPetType").text(pet.PetType)
+                $("#viewPetBreed").text(pet.PetBreed)
+                $("#viewPetBdate").text(pet.PetBdate)
+                $("#viewPetGender").text(pet.PetGender)
+                $("#viewPetNotes").text(pet.PetNotes)
+                $("#viewPetOwnerID").text(pet.PetOwnerID)
+                $("#viewPetIsActive").text(pet.IsActive)
+                $("#viewPetIsActive").attr(
+                    "class",
+                    "badge " +
+                        (pet.IsActive === "Yes" ? "bg-success" : "bg-danger")
+                )
+            }
+        </script>
+    </body>
+</html>
